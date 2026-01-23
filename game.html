@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Breaker Pro - Gameplay</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f4b 100%);
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header h1 {
+    font-size: 2.2rem;
+    background: linear-gradient(90deg, #00f3ff, #ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
+/* Main Container */
+.main-container {
+    display: flex;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 30px;
+    min-height: calc(100vh - 80px);
+}
+
+/* Game Canvas Area - Much Larger */
+.canvas-section {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+}
+
+.canvas-container {
+    background: #000;
+    border-radius: 15px;
+    border: 2px solid rgba(0, 243, 255, 0.3);
+    box-shadow: 0 0 40px rgba(0, 243, 255, 0.2);
+    overflow: hidden;
+    position: relative;
+    flex: 1;
+    min-height: 700px;
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Stats Panel */
+.stats-section {
+    flex: 1;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.stats-panel {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.panel-title {
+    color: #00f3ff;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel-title i {
+    font-size: 1.2rem;
+}
+
+/* Score Section */
+.score-display {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(255, 0, 255, 0.1));
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.score-value {
+    font-size: 3.5rem;
+    font-weight: 800;
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.score-label {
+    text-align: center;
+    color: #a0a0ff;
+    font-size: 1rem;
+}
+
+/* Stat Grid */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.stat-label {
+    color: #a0a0ff;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stat-value {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Lives Display */
+.lives-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.life {
+    width: 36px;
+    height: 36px;
+    background: radial-gradient(circle at 30% 30%, #ff3366, #cc0055);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 0 15px #ff3366;
+    position: relative;
+    overflow: hidden;
+}
+
+.life::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    filter: blur(1px);
+}
+
+.life::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+}
+
+/* Combo Display */
+.combo-container {
+    margin-top: 20px;
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 0, 102, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 0, 102, 0.3);
+}
+
+.combo-label {
+    color: #ff99cc;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.combo-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #ff0066;
+    text-shadow: 0 0 15px rgba(255, 0, 102, 0.7);
+}
+
+/* Progress Bars */
+.progress-container {
+    margin-top: 15px;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    color: #a0a0ff;
+    font-size: 0.9rem;
+}
+
+.progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f3ff, #0099ff);
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+/* Power-ups */
+.power-ups-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.power-up-badge {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(255, 0, 255, 0.2));
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 140px;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+}
+
+.power-up-icon {
+    font-size: 1.3rem;
+}
+
+/* High Scores */
+.high-scores-list {
+    margin-top: 15px;
+}
+
+.score-entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.2s;
+}
+
+.score-entry:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.score-difficulty {
+    color: #a0a0ff;
+}
+
+.score-number {
+    color: #ffcc00;
+    font-weight: 700;
+}
+
+/* Controls */
+.controls-container {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.control-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.control-btn.primary {
+    background: linear-gradient(90deg, #00f3ff, #0099ff);
+    color: #000;
+}
+
+.control-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Overlay */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+}
+
+.overlay-content {
+    max-width: 500px;
+    text-align: center;
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    border: 2px solid rgba(0, 243, 255, 0.3);
+    box-shadow: 0 0 40px rgba(0, 243, 255, 0.2);
+}
+
+.overlay h2 {
+    font-size: 3rem;
+    color: #00f3ff;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px #00f3ff;
+}
+
+.final-score {
+    font-size: 4rem !important;
+    color: #ffcc00 !important;
+    margin: 20px 0 !important;
+    text-shadow: 0 0 20px #ffcc00 !important;
+}
+
+/* Combo Display */
+.combo-display {
+    position: absolute;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #ff0066;
+    text-shadow: 0 0 20px #ff0066;
+    z-index: 50;
+    pointer-events: none;
+    animation: comboFloat 1.5s ease-out forwards;
+}
+
+@keyframes comboFloat {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
+/* Hide power-ups UI but keep functionality */
+/* Hide power-ups UI */
+.power-ups-container,
+.progress-container {
+    display: none !important;
+}
+
+/* Also hide the label for power-ups */
+.stat-label:has(i.fa-bolt) {
+    display: none !important;
+}
+
+/* Particles */
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #00f3ff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .main-container {
+        flex-direction: column;
+    }
+    
+    .canvas-container {
+        min-height: 500px;
+    }
+    
+    .stats-section {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .overlay-content {
+        padding: 20px;
+        margin: 20px;
+    }
+    
+    .overlay h2 {
+        font-size: 2rem;
+    }
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <h1>NEON BREAKER PRO - GAMEPLAY</h1>
+    </div>
+
+    <div class="main-container">
+        <div class="canvas-section">
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="1200" height="700"></canvas>
+                
+                <!-- Game Over Overlay -->
+                <div id="gameOverMenu" class="overlay" style="display: none;">
+                    <div class="overlay-content">
+                        <h2>GAME OVER</h2>
+                        <div class="final-score" id="finalScore">0</div>
+                        <p>Level: <span id="finalLevel">1</span></p>
+                        <p>Difficulty: <span id="finalDifficulty">NORMAL</span></p>
+                        <div style="margin: 30px 0;">
+                            <div class="controls-container">
+                                <button class="control-btn primary" onclick="restartGame()">
+                                    <i class="fas fa-redo"></i> PLAY AGAIN
+                                </button>
+                                <button class="control-btn secondary" onclick="goToMainMenu()">
+                                    <i class="fas fa-home"></i> MAIN MENU
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls-container" style="margin-top: 20px;">
+                <button class="control-btn secondary" id="pauseBtn">
+                    <i class="fas fa-pause"></i> PAUSE
+                </button>
+                <button class="control-btn secondary" id="restartBtn">
+                    <i class="fas fa-redo"></i> RESTART
+                </button>
+                <button class="control-btn secondary" onclick="goToMainMenu()">
+                    <i class="fas fa-home"></i> MENU
+                </button>
+            </div>
+        </div>
+        
+        <div class="stats-section">
+            <div class="stats-panel">
+                <h2 class="panel-title"><i class="fas fa-chart-line"></i> GAME STATISTICS</h2>
+                
+                <div class="score-display">
+                    <div class="score-value" id="scoreDisplay">0</div>
+                    <div class="score-label">CURRENT SCORE</div>
+                </div>
+                
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-label"><i class="fas fa-layer-group"></i> LEVEL</div>
+                        <div class="stat-value" id="levelDisplay">1</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label"><i class="fas fa-tachometer-alt"></i> DIFFICULTY</div>
+                        <div class="stat-value" id="difficultyDisplay">NORMAL</div>
+                    </div>
+                    <div class="combo-container">
+                        <div class="combo-label"><i class="fas fa-fire"></i> COMBO MULTIPLIER</div>
+                        <div class="combo-value" id="comboDisplay">x1</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label"><i class="fas fa-bricks"></i> BRICKS LEFT</div>
+                        <div class="stat-value" id="bricksLeft">0</div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>POWER-UP TIMER</span>
+                        <span id="powerTimerDisplay">0s</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="powerFill"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-panel">
+                <h2 class="panel-title"><i class="fas fa-heart"></i> LIVES & POWER-UPS</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <div class="stat-label"><i class="fas fa-heartbeat"></i> LIVES</div>
+                    <div class="lives-container" id="livesDisplay">
+                        <!-- Lives will be added here -->
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <div class="stat-label"><i class="fas fa-bolt"></i> ACTIVE POWER-UPS</div>
+                    <div class="power-ups-container" id="activePowerUpsContainer">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-panel">
+                <h2 class="panel-title"><i class="fas fa-trophy"></i> HIGH SCORES</h2>
+                <div class="high-scores-list" id="highScoresList">
+                    <!-- High scores will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ========== GAME VARIABLES ==========
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let gameRunning = false;
+let paused = false;
+
+// Get difficulty from localStorage
+const currentDifficulty = localStorage.getItem('selectedDifficulty') || 'normal';
+
+// Game objects
+let paddle = { x: canvas.width/2 - 60, y: canvas.height - 40, width: 120, height: 15, speed: 10 };
+let balls = [];
+let bricks = [];
+let powerUps = [];
+let lasers = [];
+let particles = [];
+
+// Game state
+let score = 0;
+let lives = 3;
+let level = 1;
+let combo = 1;
+let comboTimer = 0;
+let activePowerUps = new Map(); // Changed from single power-up to Map
+let powerUpTimer = 0;
+let brickRows = 5;
+let brickCols = 10;
+
+// High scores
+let highScores = {
+    easy: 0,
+    normal: 0,
+    hard: 0
+};
+
+// ========== INITIALIZATION ==========
+function init() {
+    // Load high scores
+    loadHighScores();
+    
+    // Set difficulty
+    setDifficulty(currentDifficulty);
+    
+    // Set up event listeners
+    canvas.addEventListener('mousemove', movePaddle);
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    
+    document.getElementById('pauseBtn').onclick = togglePause;
+    document.getElementById('restartBtn').onclick = restartGame;
+    
+    // Start game
+    startGame();
+}
+
+// ========== BRICK GENERATION ==========
+function generateBricks() {
+    bricks = [];
+    const brickWidth = 80;
+    const brickHeight = 30;
+    const gap = 8;
+    const offsetX = (canvas.width - (brickCols * (brickWidth + gap) - gap)) / 2;
+    const offsetY = 50;
+    
+    // Random pattern
+    const pattern = ['solid', 'checker', 'pyramid'][Math.floor(Math.random() * 3)];
+    
+    for (let row = 0; row < brickRows; row++) {
+        for (let col = 0; col < brickCols; col++) {
+            let shouldCreate = true;
+            
+            switch(pattern) {
+                case 'checker':
+                    shouldCreate = (row + col) % 2 === 0;
+                    break;
+                case 'pyramid':
+                    shouldCreate = col >= row && col < brickCols - row;
+                    break;
+            }
+            
+            if (!shouldCreate) continue;
+            
+            let hits = 1;
+            let hasPowerUp = false;
+            
+            if (Math.random() < 0.1) {
+                hits = 2;
+            }
+            
+            if (Math.random() < 0.08) {
+                hasPowerUp = true;
+            }
+            
+            bricks.push({
+                x: offsetX + col * (brickWidth + gap),
+                y: offsetY + row * (brickHeight + gap),
+                width: brickWidth,
+                height: brickHeight,
+                hits: hits,
+                maxHits: hits,
+                hasPowerUp: hasPowerUp,
+                color: hits === 2 ? '#ff00ff' : '#00ffaa'
+            });
+        }
+    }
+}
+
+// ========== GAME FUNCTIONS ==========
+function startGame() {
+    gameRunning = true;
+    paused = false;
+    
+    // Hide game over overlay
+    document.getElementById('gameOverMenu').style.display = 'none';
+        lives = getInitialLives(); // Add this function call
+
+    // Reset game state
+    score = 0;
+    level = 1;
+    combo = 1;
+    balls = [];
+    powerUps = [];
+    lasers = [];
+    particles = [];
+    activePowerUps.clear();
+    
+    // Create initial ball
+    balls.push({
+        x: canvas.width/2,
+        y: canvas.height/2,
+        radius: 12,
+        speedX: 5 * (Math.random() > 0.5 ? 1 : -1),
+        speedY: -5,
+        color: '#00f3ff'
+    });
+    
+    // Generate bricks
+    generateBricks();
+    
+    // Update display
+    updateDisplay();
+    
+    // Start game loop
+    gameLoop();
+}
+
+function setDifficulty(difficulty) {
+    switch(difficulty) {
+        case 'easy':
+            brickRows = 4;
+            brickCols = 8;
+            lives = 5;
+            paddle.width = 150;
+            break;
+        case 'normal':
+            brickRows = 5;
+            brickCols = 10;
+            lives = 4;
+            paddle.width = 120;
+            break;
+        case 'hard':
+            brickRows = 6;
+            brickCols = 12;
+            lives = 3;
+            paddle.width = 100;
+            break;
+    }
+    
+    document.getElementById('difficultyDisplay').textContent = difficulty.toUpperCase();
+    document.getElementById('finalDifficulty').textContent = difficulty.toUpperCase();
+}
+function getInitialLives() {
+    switch(currentDifficulty) {
+        case 'easy': return 5;
+        case 'normal': return 4;
+        case 'hard': return 3;
+        default: return 3;
+    }
+}
+
+function restartGame() {
+    startGame();
+}
+
+function gameOver() {
+    gameRunning = false;
+    
+    // Update high score
+    if (score > highScores[currentDifficulty]) {
+        highScores[currentDifficulty] = score;
+        saveHighScores();
+    }
+    
+    // Update display
+    document.getElementById('finalScore').textContent = score;
+    document.getElementById('finalLevel').textContent = level;
+    document.getElementById('gameOverMenu').style.display = 'flex';
+    
+    updateDisplay();
+}
+
+function levelComplete() {
+    level++;
+    
+    // Clear power ups and lasers
+    powerUps = [];
+    lasers = [];
+    activePowerUps.clear();
+    
+    // Increase ball speed
+    balls.forEach(b => {
+        b.speedX *= 1.1;
+        b.speedY *= 1.1;
+    });
+    
+    // Generate new bricks
+    generateBricks();
+    
+    // Reset ball
+    balls = [{
+        x: canvas.width/2,
+        y: canvas.height/2,
+        radius: 12,
+        speedX: 5 * (Math.random() > 0.5 ? 1 : -1),
+        speedY: -5,
+        color: '#00f3ff'
+    }];
+    
+    // Add score bonus
+    score += 100 * level;
+    
+    updateDisplay();
+}
+
+// ========== UPDATE FUNCTIONS ==========
+function update() {
+    if (!gameRunning || paused) return;
+    
+    // Move paddle with keyboard
+    if (keys.ArrowLeft) paddle.x = Math.max(0, paddle.x - paddle.speed);
+    if (keys.ArrowRight) paddle.x = Math.min(canvas.width - paddle.width, paddle.x + paddle.speed);
+    
+    // Update active power-ups timers
+    for (const [type, timer] of activePowerUps.entries()) {
+        if (timer > 0) {
+            activePowerUps.set(type, timer - 1);
+            if (timer - 1 <= 0) {
+                deactivatePowerUp(type);
+            }
+        }
+    }
+    
+    // Update balls
+    balls.forEach((ball, ballIndex) => {
+        ball.x += ball.speedX;
+        ball.y += ball.speedY;
+        
+        // Wall collision
+        if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+            ball.speedX *= -1;
+            createParticles(ball.x, ball.y, ball.color);
+        }
+        if (ball.y - ball.radius < 0) {
+            ball.speedY *= -1;
+            createParticles(ball.x, ball.y, ball.color);
+        }
+        
+        // Paddle collision
+        if (ball.y + ball.radius > paddle.y && 
+            ball.y - ball.radius < paddle.y + paddle.height &&
+            ball.x > paddle.x && 
+            ball.x < paddle.x + paddle.width) {
+            
+            let hitPos = (ball.x - paddle.x) / paddle.width;
+            ball.speedX = (hitPos - 0.5) * 12;
+            ball.speedY = -Math.abs(ball.speedY);
+            
+            createParticles(ball.x, paddle.y, '#00f3ff');
+        }
+        
+        // Brick collision
+        let bricksHit = 0;
+        bricks.forEach((brick, brickIndex) => {
+            if (brick.hits > 0) {
+                if (ball.x + ball.radius > brick.x &&
+                    ball.x - ball.radius < brick.x + brick.width &&
+                    ball.y + ball.radius > brick.y &&
+                    ball.y - ball.radius < brick.y + brick.height) {
+                    
+                    brick.hits--;
+                    bricksHit++;
+                    
+                    // Determine bounce direction
+                    let overlapLeft = ball.x + ball.radius - brick.x;
+                    let overlapRight = brick.x + brick.width - (ball.x - ball.radius);
+                    let overlapTop = ball.y + ball.radius - brick.y;
+                    let overlapBottom = brick.y + brick.height - (ball.y - ball.radius);
+                    
+                    let minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+                    
+                    if (minOverlap === overlapTop || minOverlap === overlapBottom) {
+                        ball.speedY *= -1;
+                    } else {
+                        ball.speedX *= -1;
+                    }
+                    
+                    // Add score
+                    score += 10 * combo;
+                    
+                    // Create particles
+                    createParticles(brick.x + brick.width/2, brick.y + brick.height/2, brick.color, 20);
+                    
+                    // Spawn power-up if brick had one
+                    if (brick.hasPowerUp && brick.hits === 0) {
+                        spawnPowerUp(brick.x + brick.width/2, brick.y + brick.height/2);
+                    }
+                }
+            }
+        });
+        
+        // Update combo
+        if (bricksHit > 0) {
+            combo += bricksHit;
+            comboTimer = 60;
+            
+            // Show combo text
+            showCombo(ball.x, ball.y, `x${combo}`);
+            
+            // Speed up balls with combo
+            let speedMultiplier = 1 + combo * 0.05;
+            ball.speedX = Math.sign(ball.speedX) * Math.min(Math.abs(ball.speedX) * speedMultiplier, 15);
+            ball.speedY = Math.sign(ball.speedY) * Math.min(Math.abs(ball.speedY) * speedMultiplier, 15);
+        }
+        
+        // Ball lost
+        if (ball.y > canvas.height) {
+            balls.splice(ballIndex, 1);
+            createParticles(ball.x, ball.y, '#ff0066', 25);
+        }
+    });
+    
+    // Combo timer
+    if (comboTimer > 0) {
+        comboTimer--;
+        if (comboTimer === 0) {
+            combo = 1;
+        }
+    }
+    
+    // Update power-ups
+    powerUps.forEach((powerUp, index) => {
+        powerUp.y += 3;
+        
+        // Collect power-up
+        if (powerUp.y > paddle.y && 
+            powerUp.y < paddle.y + paddle.height &&
+            powerUp.x > paddle.x && 
+            powerUp.x < paddle.x + paddle.width) {
+            
+            activatePowerUp(powerUp.type);
+            powerUps.splice(index, 1);
+            createParticles(powerUp.x, powerUp.y, powerUp.color, 25);
+        }
+        
+        // Remove if off screen
+        if (powerUp.y > canvas.height) {
+            powerUps.splice(index, 1);
+        }
+    });
+    
+    // Update lasers
+    lasers.forEach((laser, index) => {
+        laser.y -= 10;
+        
+        // Check collision with bricks
+        bricks.forEach(brick => {
+            if (brick.hits > 0 &&
+                laser.x > brick.x &&
+                laser.x < brick.x + brick.width &&
+                laser.y > brick.y &&
+                laser.y < brick.y + brick.height) {
+                
+                brick.hits--;
+                score += 10;
+                createParticles(laser.x, laser.y, '#ff0000', 15);
+                
+                if (brick.hits === 0 && brick.hasPowerUp) {
+                    spawnPowerUp(brick.x + brick.width/2, brick.y + brick.height/2);
+                }
+                
+                lasers.splice(index, 1);
+            }
+        });
+        
+        // Remove if off screen
+        if (laser.y < 0) {
+            lasers.splice(index, 1);
+        }
+    });
+    
+    // Update particles
+    particles.forEach((particle, index) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.life--;
+        
+        if (particle.life <= 0) {
+            particles.splice(index, 1);
+        }
+    });
+    
+    // Check game over
+    if (balls.length === 0) {
+        lives--;
+        updateDisplay();
+        
+        if (lives <= 0) {
+            gameOver();
+        } else {
+            // Reset ball
+            balls.push({
+                x: canvas.width/2,
+                y: canvas.height/2,
+                radius: 12,
+                speedX: 5 * (Math.random() > 0.5 ? 1 : -1),
+                speedY: -5,
+                color: '#00f3ff'
+            });
+        }
+    }
+    
+    // Check level complete
+    if (bricks.every(brick => brick.hits === 0)) {
+        levelComplete();
+    }
+    
+    updateDisplay();
+}
+
+// ========== DRAW FUNCTIONS ==========
+function draw() {
+    // Clear canvas
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw grid background
+    drawGrid();
+    
+    // Draw particles
+    drawParticles();
+    
+    // Draw bricks
+    drawBricks();
+    
+    // Draw power-ups
+    drawPowerUps();
+    
+    // Draw lasers
+    drawLasers();
+    
+    // Draw paddle with expand power-up effect
+    let paddleWidth = paddle.width;
+    if (activePowerUps.has('expand')) {
+        paddleWidth = paddle.width * 1.5;
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = '#ffff00';
+    } else {
+        ctx.fillStyle = '#00f3ff';
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#00f3ff';
+    }
+    
+    ctx.fillRect(paddle.x - (paddleWidth - paddle.width)/2, paddle.y, paddleWidth, paddle.height);
+    ctx.shadowBlur = 0;
+    
+    // Draw balls with slow power-up effect
+    balls.forEach(ball => {
+        if (activePowerUps.has('slow')) {
+            ctx.fillStyle = `rgba(0, 255, 255, 0.4)`;
+        } else {
+            ctx.fillStyle = `rgba(0, 243, 255, 0.4)`;
+        }
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius + 5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw ball
+        const gradient = ctx.createRadialGradient(
+            ball.x - 5, ball.y - 5, 0,
+            ball.x, ball.y, ball.radius
+        );
+        gradient.addColorStop(0, '#ffffff');
+        gradient.addColorStop(1, activePowerUps.has('slow') ? '#00ffff' : ball.color);
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    
+    // Draw game info
+    drawGameInfo();
+    
+    // Draw pause screen
+    if (paused) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = 'bold 60px Arial';
+        ctx.textAlign = 'center';
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = '#00f3ff';
+        ctx.fillText('PAUSED', canvas.width/2, canvas.height/2);
+        ctx.shadowBlur = 0;
+    }
+}
+
+function drawGrid() {
+    ctx.strokeStyle = 'rgba(0, 243, 255, 0.03)';
+    ctx.lineWidth = 1;
+    
+    // Vertical lines
+    for (let x = 0; x < canvas.width; x += 50) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
+    
+    // Horizontal lines
+    for (let y = 0; y < canvas.height; y += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+}
+
+function drawBricks() {
+    bricks.forEach(brick => {
+        if (brick.hits > 0) {
+            // Draw brick
+            ctx.fillStyle = brick.color;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = brick.color;
+            ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+            ctx.shadowBlur = 0;
+            
+            // Draw hit count for multi-hit bricks
+            if (brick.maxHits > 1) {
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(brick.hits, brick.x + brick.width/2, brick.y + brick.height/2 + 5);
+            }
+        }
+    });
+}
+
+function drawPowerUps() {
+    powerUps.forEach(powerUp => {
+        // Draw glow
+        ctx.fillStyle = `${powerUp.color}40`;
+        ctx.beginPath();
+        ctx.arc(powerUp.x, powerUp.y, 15, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw power-up
+        ctx.fillStyle = powerUp.color;
+        ctx.beginPath();
+        ctx.arc(powerUp.x, powerUp.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw symbol
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(powerUp.symbol, powerUp.x, powerUp.y);
+    });
+}
+
+function drawLasers() {
+    lasers.forEach(laser => {
+        ctx.fillStyle = '#ff0000';
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#ff0000';
+        ctx.fillRect(laser.x - 3, laser.y, 6, 20);
+        ctx.shadowBlur = 0;
+    });
+}
+
+function drawParticles() {
+    particles.forEach(particle => {
+        ctx.fillStyle = particle.color;
+        ctx.globalAlpha = particle.life / 25;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    });
+}
+
+function drawGameInfo() {
+    // Draw score in canvas corner
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`SCORE: ${score}`, 20, 35);
+    ctx.fillText(`LEVEL: ${level}`, 20, 60);
+}
+
+// ========== POWER-UP SYSTEM ==========
+function spawnPowerUp(x, y) {
+    const powerUpsList = [
+        { type: 'laser', color: '#ff0000', symbol: '⚡', icon: 'fas fa-bolt' },
+        { type: 'multiball', color: '#00ff00', symbol: '🌀', icon: 'fas fa-bullseye' },
+        { type: 'expand', color: '#ffff00', symbol: '📏', icon: 'fas fa-expand-alt' },
+        { type: 'slow', color: '#00ffff', symbol: '🐌', icon: 'fas fa-tachometer-alt' }
+    ];
+    
+    const powerUp = powerUpsList[Math.floor(Math.random() * powerUpsList.length)];
+    powerUps.push({
+        x: x,
+        y: y,
+        type: powerUp.type,
+        color: powerUp.color,
+        symbol: powerUp.symbol,
+        icon: powerUp.icon
+    });
+}
+
+function activatePowerUp(type) {
+    // Set timer for power-up (5 seconds)
+    activePowerUps.set(type, 300);
+    
+    switch(type) {
+        case 'laser':
+            // Laser ability already handled in fireLaser function
+            break;
+        case 'multiball':
+            // Create two extra balls
+            for (let i = 0; i < 2; i++) {
+                balls.push({
+                    x: balls[0].x,
+                    y: balls[0].y,
+                    radius: 12,
+                    speedX: (Math.random() - 0.5) * 8,
+                    speedY: -Math.abs(balls[0].speedY),
+                    color: '#00ff00'
+                });
+            }
+            break;
+        case 'expand':
+            // Expand effect handled in draw function
+            break;
+        case 'slow':
+            // Slow effect handled in draw function
+            balls.forEach(ball => {
+                ball.speedX *= 0.5;
+                ball.speedY *= 0.5;
+            });
+            break;
+    }
+    
+    updateDisplay();
+}
+
+function deactivatePowerUp(type) {
+    activePowerUps.delete(type);
+    
+    switch(type) {
+        case 'expand':
+            // Nothing to revert - handled in draw
+            break;
+        case 'slow':
+            balls.forEach(ball => {
+                ball.speedX *= 2;
+                ball.speedY *= 2;
+            });
+            break;
+    }
+    
+    updateDisplay();
+}
+
+function fireLaser() {
+    if (activePowerUps.has('laser')) {
+        lasers.push({
+            x: paddle.x + paddle.width/2,
+            y: paddle.y
+        });
+    }
+}
+
+// ========== PARTICLE SYSTEM ==========
+function createParticles(x, y, color, count = 15) {
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
+            color: color,
+            life: 25
+        });
+    }
+}
+
+// ========== COMBO DISPLAY ==========
+function showCombo(x, y, text) {
+    const comboEl = document.createElement('div');
+    comboEl.className = 'combo-display';
+    comboEl.style.left = x + 'px';
+    comboEl.style.top = y + 'px';
+    comboEl.textContent = text;
+    document.querySelector('.canvas-container').appendChild(comboEl);
+    
+    // Remove after animation
+    setTimeout(() => {
+        comboEl.remove();
+    }, 1500);
+}
+
+// ========== INPUT HANDLING ==========
+let keys = {};
+function handleKeyDown(e) {
+    keys[e.key] = true;
+    
+    if (e.key === ' ' && gameRunning && !paused) {
+        fireLaser();
+    }
+    
+    if (e.key === 'p' || e.key === 'P') {
+        togglePause();
+    }
+}
+
+function handleKeyUp(e) {
+    keys[e.key] = false;
+}
+
+function movePaddle(e) {
+    if (!gameRunning || paused) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    paddle.x = e.clientX - rect.left - paddle.width/2;
+    
+    // Keep paddle in bounds
+    paddle.x = Math.max(0, Math.min(canvas.width - paddle.width, paddle.x));
+}
+
+function togglePause() {
+    if (!gameRunning) return;
+    paused = !paused;
+    document.getElementById('pauseBtn').innerHTML = paused ? 
+        '<i class="fas fa-play"></i> RESUME' : 
+        '<i class="fas fa-pause"></i> PAUSE';
+}
+
+function goToMainMenu() {
+    window.location.href = 'index.html';
+}
+
+// ========== DISPLAY UPDATES ==========
+function updateDisplay() {
+    // Update score
+    document.getElementById('scoreDisplay').textContent = score;
+    document.getElementById('comboDisplay').textContent = `x${combo}`;
+    document.getElementById('levelDisplay').textContent = level;
+    
+    // Update bricks left
+    const bricksLeft = bricks.filter(b => b.hits > 0).length;
+    document.getElementById('bricksLeft').textContent = bricksLeft;
+    
+    // Update lives display with heart icons
+    const livesDisplay = document.getElementById('livesDisplay');
+    livesDisplay.innerHTML = '';
+    for (let i = 0; i < lives; i++) {
+        const life = document.createElement('div');
+        life.className = 'life';
+        livesDisplay.appendChild(life);
+    }
+    
+    // Update active power-ups display
+    const powerUpsContainer = document.getElementById('activePowerUpsContainer');
+    powerUpsContainer.innerHTML = '';
+    
+    if (activePowerUps.size === 0) {
+        const emptyBadge = document.createElement('div');
+        emptyBadge.className = 'power-up-badge';
+        emptyBadge.innerHTML = '<i class="fas fa-times power-up-icon"></i><span>No active power-ups</span>';
+        emptyBadge.style.background = 'rgba(255, 255, 255, 0.1)';
+        powerUpsContainer.appendChild(emptyBadge);
+    } else {
+        activePowerUps.forEach((timer, type) => {
+            const badge = document.createElement('div');
+            badge.className = 'power-up-badge';
+            
+            let icon = 'fas fa-question';
+            let label = type;
+            let color = 'rgba(0, 243, 255, 0.3)';
+            
+            switch(type) {
+                case 'laser':
+                    icon = 'fas fa-bolt';
+                    label = 'LASER';
+                    color = 'linear-gradient(135deg, rgba(255, 0, 0, 0.3), rgba(255, 100, 100, 0.3))';
+                    break;
+                case 'multiball':
+                    icon = 'fas fa-bullseye';
+                    label = 'MULTI-BALL';
+                    color = 'linear-gradient(135deg, rgba(0, 255, 0, 0.3), rgba(100, 255, 100, 0.3))';
+                    break;
+                case 'expand':
+                    icon = 'fas fa-expand-alt';
+                    label = 'EXPAND PADDLE';
+                    color = 'linear-gradient(135deg, rgba(255, 255, 0, 0.3), rgba(255, 255, 100, 0.3))';
+                    break;
+                case 'slow':
+                    icon = 'fas fa-tachometer-alt';
+                    label = 'SLOW MOTION';
+                    color = 'linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(100, 255, 255, 0.3))';
+                    break;
+            }
+            
+            badge.style.background = color;
+            badge.innerHTML = `
+                <i class="${icon} power-up-icon"></i>
+                <div>
+                    <div style="font-weight: 600;">${label}</div>
+                    <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">${Math.ceil(timer/60)}s</div>
+                </div>
+            `;
+            powerUpsContainer.appendChild(badge);
+        });
+    }
+    
+    // Update power-up timer progress bar
+    const powerFill = document.getElementById('powerFill');
+    const powerTimerDisplay = document.getElementById('powerTimerDisplay');
+    
+    // Find the longest remaining timer
+    let longestTimer = 0;
+    activePowerUps.forEach(timer => {
+        if (timer > longestTimer) longestTimer = timer;
+    });
+    
+    if (longestTimer > 0) {
+        const percentage = (longestTimer / 300 * 100);
+        powerFill.style.width = percentage + '%';
+        powerTimerDisplay.textContent = Math.ceil(longestTimer / 60) + 's';
+    } else {
+        powerFill.style.width = '0%';
+        powerTimerDisplay.textContent = '0s';
+    }
+    
+    // Update high scores list
+    updateHighScoresList();
+}
+
+function updateHighScoresList() {
+    const list = document.getElementById('highScoresList');
+    list.innerHTML = '';
+    
+    for (const [difficulty, score] of Object.entries(highScores)) {
+        const item = document.createElement('div');
+        item.className = 'score-entry';
+        item.innerHTML = `
+            <span class="score-difficulty">${difficulty.toUpperCase()}</span>
+            <span class="score-number">${score}</span>
+        `;
+        list.appendChild(item);
+    }
+}
+
+// ========== DATA PERSISTENCE ==========
+function loadHighScores() {
+    const saved = localStorage.getItem('neonBreakerHighScores');
+    if (saved) {
+        highScores = JSON.parse(saved);
+    }
+    updateHighScoresList();
+}
+
+function saveHighScores() {
+    localStorage.setItem('neonBreakerHighScores', JSON.stringify(highScores));
+}
+
+// ========== GAME LOOP ==========
+function gameLoop() {
+    if (!gameRunning) return;
+    
+    update();
+    draw();
+    
+    requestAnimationFrame(gameLoop);
+}
+
+// ========== START GAME ==========
+window.onload = init;
+</script>
+</body>
+</html>

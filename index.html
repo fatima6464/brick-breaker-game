@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Breaker Pro - Main Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f4b 50%, #2a2f6b 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+            animation: fadeIn 1s ease;
+        }
+
+        .logo {
+            font-size: 4.5rem;
+            background: linear-gradient(90deg, #00f3ff, #ff00ff, #00ffaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: #a0a0ff;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .game-preview {
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .preview-title {
+            color: #00f3ff;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-title i {
+            font-size: 1.5rem;
+        }
+
+        .preview-canvas {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 10px;
+            border: 2px solid #00f3ff;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .preview-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(transparent 70%, rgba(0, 243, 255, 0.1));
+        }
+
+        .ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #00f3ff, #0099ff);
+            border-radius: 50%;
+            top: 50%;
+            left: 30%;
+            animation: bounce 2s infinite alternate;
+            box-shadow: 0 0 15px #00f3ff;
+        }
+
+        .paddle {
+            position: absolute;
+            width: 120px;
+            height: 15px;
+            background: linear-gradient(90deg, #00f3ff, #0099ff);
+            border-radius: 8px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px #00f3ff;
+        }
+
+        .brick {
+            position: absolute;
+            width: 60px;
+            height: 25px;
+            background: linear-gradient(135deg, #ff00ff, #cc00cc);
+            border-radius: 5px;
+            top: 40px;
+            left: 40%;
+            box-shadow: 0 0 10px #ff00ff;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            background: rgba(0, 243, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-item i {
+            color: #00f3ff;
+            margin-right: 8px;
+        }
+
+        .setup-panel {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel-title {
+            color: #00f3ff;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            font-size: 1.5rem;
+        }
+
+        .difficulty-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #a0a0ff;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 18px;
+            background: rgba(0, 243, 255, 0.1);
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .difficulty-btn:hover {
+            transform: translateY(-3px);
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .difficulty-btn.active {
+            background: rgba(0, 243, 255, 0.3);
+            border-color: #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+        }
+
+        .difficulty-icon {
+            font-size: 1.8rem;
+        }
+
+        .controls-section {
+            margin-bottom: 30px;
+        }
+
+        .control-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 243, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #00f3ff;
+        }
+
+        .control-text {
+            flex: 1;
+        }
+
+        .control-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+
+        .control-desc {
+            color: #a0a0ff;
+            font-size: 0.9rem;
+        }
+
+        .start-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .start-btn {
+            background: linear-gradient(90deg, #00f3ff, #0099ff);
+            color: #000;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 243, 255, 0.5);
+        }
+
+        .start-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .high-scores {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .scores-title {
+            color: #00f3ff;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .score-card {
+            background: rgba(0, 243, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .score-card:hover {
+            transform: translateY(-5px);
+            background: rgba(0, 243, 255, 0.15);
+        }
+
+        .score-difficulty {
+            color: #a0a0ff;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .score-value {
+            color: #ffcc00;
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+
+        .score-player {
+            color: #a0a0ff;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-100px) translateX(100px); }
+            50% { transform: translateY(0) translateX(200px); }
+            75% { transform: translateY(-100px) translateX(300px); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .logo {
+                font-size: 3rem;
+            }
+            
+            .difficulty-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">NEON BREAKER PRO</h1>
+            <p class="tagline">Experience the ultimate brick-breaking challenge with stunning neon visuals and intense gameplay mechanics</p>
+        </div>
+
+        <div class="main-content">
+            <div class="game-preview">
+                <h2 class="preview-title"><i class="fas fa-gamepad"></i> GAME PREVIEW</h2>
+                <div class="preview-canvas">
+                    <div class="preview-animation">
+                        <div class="ball"></div>
+                        <div class="paddle"></div>
+                        <div class="brick"></div>
+                    </div>
+                </div>
+                <div class="game-info">
+                    <div class="info-item">
+                        <i class="fas fa-bolt"></i> Dynamic Power-ups
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-layer-group"></i> Multiple Levels
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-tachometer-alt"></i> Progressive Difficulty
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-fire"></i> Combo System
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-panel">
+                <h2 class="panel-title"><i class="fas fa-cogs"></i> GAME SETUP</h2>
+                
+                <div class="difficulty-section">
+                    <h3 class="section-title">SELECT DIFFICULTY</h3>
+                    <div class="difficulty-options">
+                        <button class="difficulty-btn active" onclick="selectDifficulty('easy')">
+                            <div class="difficulty-icon">🟢</div>
+                            <div>EASY</div>
+                            <div style="font-size: 0.8rem; color: #a0a0ff;">Beginner Friendly</div>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('normal')">
+                            <div class="difficulty-icon">🔵</div>
+                            <div>NORMAL</div>
+                            <div style="font-size: 0.8rem; color: #a0a0ff;">Balanced Challenge</div>
+                        </button>
+                        <button class="difficulty-btn" onclick="selectDifficulty('hard')">
+                            <div class="difficulty-icon">🔴</div>
+                            <div>HARD</div>
+                            <div style="font-size: 0.8rem; color: #a0a0ff;">Expert Level</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <h3 class="section-title">CONTROLS</h3>
+                    <div class="control-item">
+                        <div class="control-icon">
+                            <i class="fas fa-mouse-pointer"></i>
+                        </div>
+                        <div class="control-text">
+                            <div class="control-title">Mouse Movement</div>
+                            <div class="control-desc">Move paddle left/right with mouse</div>
+                        </div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-icon">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </div>
+                        <div class="control-text">
+                            <div class="control-title">Arrow Keys</div>
+                            <div class="control-desc">← → keys for paddle control</div>
+                        </div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-icon">
+                            <i class="fas fa-space-shuttle"></i>
+                        </div>
+                        <div class="control-text">
+                            <div class="control-title">Space Bar</div>
+                            <div class="control-desc">Activate laser power-up</div>
+                        </div>
+                    </div>
+                    <div class="control-item">
+                        <div class="control-icon">
+                            <i class="fas fa-pause"></i>
+                        </div>
+                        <div class="control-text">
+                            <div class="control-title">P Key</div>
+                            <div class="control-desc">Pause/Resume game</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="start-section">
+                    <button class="start-btn" onclick="startGame()">
+                        <i class="fas fa-play-circle"></i>
+                        LAUNCH GAME
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="high-scores">
+            <h2 class="scores-title"><i class="fas fa-trophy"></i> HIGH SCORES</h2>
+            <div class="scores-grid" id="highScoresList">
+                <!-- Scores will be loaded from localStorage -->
+                <div class="score-card">
+                    <div class="score-difficulty">EASY</div>
+                    <div class="score-value">0</div>
+                    <div class="score-player">No score yet</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-difficulty">NORMAL</div>
+                    <div class="score-value">0</div>
+                    <div class="score-player">No score yet</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-difficulty">HARD</div>
+                    <div class="score-value">0</div>
+                    <div class="score-player">No score yet</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDifficulty = 'normal';
+        
+        function selectDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            
+            // Update UI
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.difficulty-btn').classList.add('active');
+            
+            // Load scores for this difficulty
+            loadHighScores();
+        }
+        
+        function loadHighScores() {
+            const scores = JSON.parse(localStorage.getItem('neonBreakerHighScores')) || {
+                easy: 0,
+                normal: 0,
+                hard: 0
+            };
+            
+            // Update display
+            document.querySelectorAll('.score-card').forEach((card, index) => {
+                const difficulty = ['easy', 'normal', 'hard'][index];
+                card.querySelector('.score-value').textContent = scores[difficulty];
+                card.querySelector('.score-player').textContent = scores[difficulty] > 0 ? 'Top Player' : 'No score yet';
+            });
+        }
+        
+        function startGame() {
+            // Save difficulty and redirect to game page
+            localStorage.setItem('selectedDifficulty', currentDifficulty);
+            window.location.href = 'game.html';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHighScores();
+        });
+    </script>
+</body>
+</html>
