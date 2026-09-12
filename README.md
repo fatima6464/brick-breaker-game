@@ -73,7 +73,8 @@ Since this is pure client-side HTML/CSS/JS, you can host it for free with **GitH
 2. Source: `main` branch, root folder → Save
 3. Play at `https://<your-username>.github.io/Neon-Breaker-Pro/`
 
-   
+   <img width="1920" height="1433" alt="image" src="https://github.com/user-attachments/assets/8c4f136d-b8b1-4d43-abfb-a13b333f3d7e" />
+
 
 ## 🧠 Implementation Notes
 
