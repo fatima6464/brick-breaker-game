@@ -23,6 +23,9 @@ Neon Breaker Pro reimagines the classic brick-breaker with a glowing neon aesthe
 - 🏆 **Persistent High Scores** — saved per difficulty via `localStorage`, no backend required
 - ⏸️ **Pause / Resume / Restart** — full game state controls, keyboard shortcut (`P`) included
 
+  <img width="1920" height="1773" alt="image" src="https://github.com/user-attachments/assets/faee6912-533b-479a-aedc-6fef025b8eeb" />
+
+
 ## 🎮 Controls
 
 | Input | Action |
@@ -69,6 +72,8 @@ Since this is pure client-side HTML/CSS/JS, you can host it for free with **GitH
 1. Repo → **Settings** → **Pages**
 2. Source: `main` branch, root folder → Save
 3. Play at `https://<your-username>.github.io/Neon-Breaker-Pro/`
+
+   
 
 ## 🧠 Implementation Notes
 
